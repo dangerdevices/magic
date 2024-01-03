@@ -63,6 +63,9 @@ global int DRCRuleOptimization = TRUE;
 /* Whether we are converting units printed from lambda to microns */
 global bool DRCPrintConvert;
 
+/* scalefactor for printing units */
+global float DRCPrintScale;
+
 /* The following variables count how many rules were specified by
  * the technology file and how many edge rules were optimized away.
  */
@@ -865,6 +868,11 @@ DRCTechLine(sectionName, argc, argv)
 	else if (strcmp(argv[1], "lambda"))
 	    TechError("print must be microns or lambda.  Using the "
 	            "default value (microns).\n");
+
+	if ((DRCPrintConvert) && (strlen(argv[0]) == 2))
+	    DRCPrintScale = atoi(argv[2]);
+	else
+	    DRCPrintScale = 1;
     }
 
     /* Process "scalefactor" line next (if any) */

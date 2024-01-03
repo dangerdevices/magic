@@ -186,7 +186,7 @@ drcSubstitute (cptr)
     static char *why_out = NULL;
     char *whyptr, *sptr, *wptr, *unit;
     int subscnt = 0, whylen;
-    float oscale, dscale, value;
+    float oscale, dscale, lscale, value;
     extern float CIFGetOutputScale();
 
     whyptr = DRCCurStyle->DRCWhyList[cptr->drcc_tag];
@@ -211,12 +211,14 @@ drcSubstitute (cptr)
 	else
 	    oscale = CIFGetOutputScale(1000);   /* 1000 for conversion to um */
 	dscale = 1;
+	lscale = 1;
     }
     else
     {
 	unit = "lambda";
 	oscale = 1;
 	dscale = CIFGetOutputScale(1);
+	lscale = CIFGetOutputScale(DRCPrintScale);
     }
 
     wptr = why_out;
@@ -231,19 +233,19 @@ drcSubstitute (cptr)
 	{
 	    case 'd':
 		/* Replace with "dist" value in microns or lambda */
-		value = (float)cptr->drcc_dist * oscale / dscale;
+		value = (float)cptr->drcc_dist * oscale * lscale / dscale;
 		snprintf(wptr, 20, "%01.3g%s", value, unit);
 		wptr += strlen(wptr);
 		break;
 	    case 'c':
 		/* Replace with "cdist" value in microns or lambda */
-		value = (float)cptr->drcc_cdist * oscale / dscale;
+		value = (float)cptr->drcc_cdist * oscale * lscale / dscale;
 		snprintf(wptr, 20, "%01.3g%s", value, unit);
 		wptr += strlen(wptr);
 		break;
 	    case 'a':
 		/* Replace with "cdist" value in microns or lambda squared */
-		value = (float)cptr->drcc_cdist * oscale * oscale / (dscale * dscale);
+		value = (float)cptr->drcc_cdist * oscale * oscale * lscale * lscale / (dscale * dscale);
 		snprintf(wptr, 20, "%01.4g%s^2", value, unit);
 		wptr += strlen(wptr);
 		break;
