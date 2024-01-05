@@ -383,6 +383,12 @@ GrTkInit(dispType)
     }
 
     grXdpy = Tk_Display(grCurrent.window);
+    if (grXdpy == NULL)
+    {
+	 TxError("No Tk display available. . . is Tk running?\n");
+	 return FALSE;
+    }
+
     grDisplay.depth = Tk_Depth(grCurrent.window);
     grCurrent.windowid = Tk_WindowId(grCurrent.window);
     grXscrn = Tk_ScreenNumber(grCurrent.window);
