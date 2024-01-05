@@ -393,44 +393,12 @@ GrTkInit(dispType)
     grCurrent.windowid = Tk_WindowId(grCurrent.window);
     grXscrn = Tk_ScreenNumber(grCurrent.window);
 
-    /* The idea here is to first try allocating the required
-     * planes out of the default colormap.  This is the kindest,
-     * gentlest thing to do because it doesn't cause all the other
-     * windows to go technicolor when the cursor is in a magic window.
-     * If this fails, we go ahead and allocate a colormap specifically
-     * for magic.  The problem now is using this colormap in such
-     * a way that the other windows' colors get mangled the least.
-     * Unfortunately, doing this is X-server dependent.  This is where
-     * the constants above come in.  X_COLORMAP_BASE indicates
-     * which part of the colormap (assuming the number of planes
-     * required is less than the number of planes in the display)
-     * to fill in the colors magic requires.  X_COLORMAP_RESERVED
-     * tells how many high-end colors the server won't let us touch;
-     * if we even try to query these colors, we get an X error.
-     * If, starting at X_COLORMAP_BASE, the number of colors required
-     * would push us into the top X_COLORMAP_RESERVED colors, then
-     * we won't be able to set all the colors the user wanted us
-     * to set.  The top colors will remain identical to those
-     * in the default colormap.
-     */
+    TxPrintf("Could not obtain Visual Info from Server %s. Will attempt default.\n",
+          getenv("DISPLAY"));
+    grDisplay.depth = 8;
+    grDisplay.colorCount = 1 << grDisplay.depth;
 
-    grXcmap = XDefaultColormap(grXdpy,grXscrn);
-
-    /* Discover properties of Server.  */
-
-    grVisual = XDefaultVisual(grXdpy, grXscrn);
-    defpsvid = XVisualIDFromVisual(grVisual);
-    grtemplate.screen = grXscrn;
-    grtemplate.depth = 0;
-    grvisual_get = XGetVisualInfo(grXdpy, VisualScreenMask, &grtemplate, &gritems);
-    if (grvisual_get == NULL)
-    {
-	TxPrintf("Could not obtain Visual Info from Server %s. Will attempt default.\n",
-              getenv("DISPLAY"));
-	grDisplay.depth = 8;
-	grDisplay.colorCount = 1 << grDisplay.depth;
-    }
-    else
+    if (FALSE && grvisual_get != NULL)
     {
 	gritems_list = gritems;
 	for (gritems = 0; gritems < gritems_list; gritems++)
